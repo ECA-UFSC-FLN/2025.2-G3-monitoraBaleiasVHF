@@ -94,20 +94,17 @@ class SimuladorAntenasDoA:
 
 
     def salvar_arquivos_iq(self, prefixo_arquivo: str = "sinal_antena"):
-        """
-        Salva um arquivo IQ separado para cada sinal de antena.
-        Ex: 'sinal_antena_A1.iq', 'sinal_antena_A2.iq', etc.
-        """
         if not self.sinais_iq:
             raise ValueError("Sinais não gerados. Chame gerar_sinais() antes de salvar.")
 
         nomes_salvos = []
         for nome_antena, sinal_iq in self.sinais_iq.items():
-            # Cria um nome de arquivo exclusivo
             nome_arquivo = f"{prefixo_arquivo}_{nome_antena}.iq"
             
-            # Salva o array complexo (I, Q, I, Q...)
-            sinal_iq.tofile(nome_arquivo)
+            # Abre o arquivo no modo write-binary para sobrescrever
+            with open(nome_arquivo, "wb") as f:
+                sinal_iq.astype(np.complex64).tofile(f)
+
             nomes_salvos.append(nome_arquivo)
 
         print(f"\n✅ Arquivos IQ gerados com sucesso ({len(nomes_salvos)} arquivos):")
