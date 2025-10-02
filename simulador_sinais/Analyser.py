@@ -63,32 +63,26 @@ class AnalisadorDoA:
 
     def calcular_doa(self, sinal_ref: np.ndarray, sinal_defasado: np.ndarray) -> float:
         """
-        Calcula o Ângulo de Incidência (DoA) a partir de dois arrays I/Q.
+        Calcula o Ângulo de Incidência (DoA) no intervalo [-90°, +90°] em relação ao boresight.
         """
         if sinal_ref.shape != sinal_defasado.shape:
             print("AVISO: Os sinais têm tamanhos diferentes.")
             return np.nan
 
-        # 1. ESTIMAÇÃO: Encontrar a Diferença de Fase (NOVA ABORDAGEM)
+        # 1. Estimar a diferença de fase
         delta_fase_rad = self._estimar_fase_fft_precisa(sinal_ref, sinal_defasado)
-        
-        # 2. CÁLCULO GEOMÉTRICO: Fase para Cosseno
-        # cos(theta) = (Delta_Fase * lambda) / (2 * pi * d)
-        lambda_sobre_d = self.lambda_onda / self.espacamento_d
-        cos_theta = (delta_fase_rad * lambda_sobre_d) / (2 * np.pi)
 
-        # 3. TRATAMENTO DE ERRO
-        cos_theta = np.clip(cos_theta, -1.0, 1.0) 
+        # 2. sin(theta) = (delta_fase * lambda) / (2 * pi * d)
+        fator = (self.lambda_onda / self.espacamento_d) / (2 * np.pi)
+        seno_theta = delta_fase_rad * fator
 
-        # 4. RESULTADO INICIAL
-        angulo_doa_radianos = np.arccos(cos_theta)
-        angulo_doa_graus = np.degrees(angulo_doa_radianos)
-        
-        # 5. CORREÇÃO DO QUADRANTE (Baseada no SINAL da Fase)
-        # Fase NEGATIVA significa que a antena defasada está ATRASADA (sinal veio de >90 graus)
-        if delta_fase_rad < 0:
-            angulo_doa_graus = 180.0 - angulo_doa_graus
+        # 3. Clipping para evitar erro numérico
+        seno_theta = np.clip(seno_theta, -1.0, 1.0)
 
-        print(f"  > Fase Estimada: {np.degrees(delta_fase_rad):.2f}° | cos(theta): {cos_theta:.4f}")
-        
+        # 4. Calcular DoA
+        angulo_doa_rad = np.arcsin(seno_theta)
+        angulo_doa_graus = np.degrees(angulo_doa_rad)
+
+        print(f"> Fase Estimada: {np.degrees(delta_fase_rad):.2f}° | sin(theta): {seno_theta:.4f} | DoA: {angulo_doa_graus:.2f}°")
+
         return angulo_doa_graus

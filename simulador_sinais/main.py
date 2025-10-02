@@ -28,7 +28,7 @@ freq_sinal = 433000000.0      # 433 MHz
 duracao = 0.001               # 1 ms
 lambda_onda = VELOCIDADE_LUZ / freq_sinal
 d_espacamento = lambda_onda / 2 
-ANGULO_VERDADEIRO = 100.0      # Ângulo que o sistema precisa descobrir (funciona só de 0 a 90)
+ANGULO_VERDADEIRO = -80.0      # Ângulo que o sistema precisa descobrir (funciona de +-90 graus)
 
 simulador = SimuladorAntenas.SimuladorAntenasDoA(taxa_amostragem, freq_sinal, duracao, ANGULO_VERDADEIRO)
 

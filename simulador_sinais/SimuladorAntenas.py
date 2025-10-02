@@ -59,7 +59,7 @@ class SimuladorAntenasDoA:
             posicao_x = pos_antena[0]
             
             # 1. Distância extra percorrida em relação à Antena de Referência
-            delta_d = (posicao_x - posicao_ref_x) * np.cos(self.angulo_rad)
+            delta_d = (posicao_x - posicao_ref_x) * np.sin(self.angulo_rad)
 
             # 2. TDOA (diferença de tempo)
             tdoa = delta_d / VELOCIDADE_LUZ
